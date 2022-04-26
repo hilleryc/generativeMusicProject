@@ -1,21 +1,26 @@
 #include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <time.h>
 #include "generatingMusic.h"
 
 //inputs are RGB values
 
-int main(char * name)
+int main(int argc, char ** argv)
 {
 
-	FILE * inFile = fopen(name, "r");
 
-	/*if(argc != 4)
+	if(argc != 2)
 	{
-		fprintf(stderr, "Need three numbers");
+		fprintf(stderr, "Need good file name");
 		return EXIT_FAILURE;
-	}*/
+	}
 
+	FILE * inFile = fopen(argv[2], "r");
+
+	printf("Get file\n");
+	
 	int rot;
 	int grun;
 	int blau;
@@ -24,7 +29,7 @@ int main(char * name)
 	RGB * avgValues;
 	songChars * song = malloc(sizeof(songChars));
 	HSV * HSVvalues = malloc(sizeof(HSV));
-	points * ModePoints = malloc(sizeof(points));
+	ModePoints * points = malloc(sizeof(ModePoints));
 	
 	//rot = (int) strtol(argv[1], NULL, 10);
 	//grun = (int) strtol(argv[2], NULL, 10);
@@ -33,10 +38,11 @@ int main(char * name)
 
 	while(fscanf(inFile, "%d %d %d", &rot, &grun, &blau) == 3)
 	{
+		printf("scans first\n");
 		avgValues = buildRGB(rot, grun, blau);
 		HSVvalues = convertHSV(avgValues);
 
-		addPoints(ModePoints, HSVvalues);	 	
+		addPoints(points, HSVvalues);	 	
 	
 	}
 
@@ -65,7 +71,7 @@ int main(char * name)
 
 	//HSVvalues = convertHSV(avgValues);
 
-	findScale(ModePoints, song);
+	findScale(points, song);
 	
 	scaleNode * beginningScale = buildScale(firstNote, song);	
 	
@@ -73,7 +79,7 @@ int main(char * name)
 
 	//For finding the note to use during operation, could use random seed, then seed%12 - 1
 	//FOR THE PURPOSES OF TESTING FUNCTIONS/OPERATIONS
-	/*
+	
 	char * printNote;
 	printf("Scale: ");
 	while(beginningScale != NULL)
@@ -103,13 +109,13 @@ int main(char * name)
 
 	printf("R Value: %d\nG Value: %d\nB Value: %d\n", avgValues -> red, avgValues -> green, avgValues -> blue);	
 	printf("Frequency: %f\n", freq);
-	*/
+	
 	//FINISHED WITH TESTING
 	fclose(inFile);
 	deleteRGB(avgValues);
 	free(song);
 	free(HSVvalues);
-	free(ModePoints);
+	free(points);
 
 	return EXIT_SUCCESS;
 }
@@ -173,7 +179,7 @@ float findFreq(Note note, songChars * song)
 	return freq;
 }
 
-points * addPoints(points * ModePoints, HSV * HSVvalues)
+ModePoints * addPoints(ModePoints * points, HSV * HSVvalues)
 {
 
 	//Placeholder for setting conditions for the RGB values to convert to what scale
@@ -183,39 +189,39 @@ points * addPoints(points * ModePoints, HSV * HSVvalues)
 		{
 			if(HSVvalues->saturation >= 0 && HSVvalues->saturation < 60)
 			{
-				ModePoints -> d = ModePoints -> d + 1;
-				ModePoints -> y = ModePoints -> y + 1;
+				points -> d = points -> d + 1;
+				points -> y = points -> y + 1;
 			}
 			else if(HSVvalues->saturation >=60 && HSVvalues->saturation <80) 
 			{
-				ModePoints -> y = ModePoints -> y + 1;
-				ModePoints -> m = ModePoints -> m + 1;
+				points -> y = points -> y + 1;
+				points -> m = points -> m + 1;
 			}
 			else 
 			{
-				ModePoints -> m = ModePoints -> m + 1;
-				ModePoints -> i = ModePoints -> i + 1;
+				points -> m = points -> m + 1;
+				points -> i = points -> i + 1;
 			}
 		}
 		else 
 		{
 			if(HSVvalues -> value <= 100 && HSVvalues -> value > 80)
 			{
-				ModePoints -> i = ModePoints -> i + 1;
+				points -> i = points -> i + 1;
 			}
 			else if(HSVvalues -> value <= 80 && HSVvalues -> value > 40)
 			{
-				ModePoints -> p = ModePoints -> p + 1;
-				ModePoints -> a = ModePoints -> a + 1;
+				points -> p = points -> p + 1;
+				points -> a = points -> a + 1;
 			}
 			else if(HSVvalues -> value <= 40 && HSVvalues -> value > 20)
 			{
-				ModePoints -> o = ModePoints -> o + 1;
-				ModePoints -> a = ModePoints -> a + 1;
+				points -> o = points -> o + 1;
+				points -> a = points -> a + 1;
 			}
 			else 
 			{
-				ModePoints -> o = ModePoints -> o + 1;
+				points -> o = points -> o + 1;
 			}
 		}	
 	}
@@ -225,32 +231,32 @@ points * addPoints(points * ModePoints, HSV * HSVvalues)
 		{
 			if(HSVvalues->saturation >= 0 && HSVvalues->saturation < 80)
 			{
-				ModePoints -> y = ModePoints -> y + 1;
+				points -> y = points -> y + 1;
 			}
 			else 
 			{
-				ModePoints -> i = ModePoints -> i + 1;
+				points -> i = points -> i + 1;
 			}
 		}
 		else 
 		{
 			if(HSVvalues -> value <= 100 && HSVvalues -> value > 80)
 			{
-				ModePoints -> i = ModePoints -> i + 1;
+				points -> i = points -> i + 1;
 			}
 			else if(HSVvalues -> value <= 80 && HSVvalues -> value > 40)
 			{
-				ModePoints -> p = ModePoints -> p + 1;
-				ModePoints -> a = ModePoints -> a + 1;
+				points -> p = points -> p + 1;
+				points -> a = points -> a + 1;
 			}
 			else if(HSVvalues -> value <= 40 && HSVvalues -> value > 20)
 			{
-				ModePoints -> o = ModePoints -> o + 1;
-				ModePoints -> a = ModePoints -> a + 1;
+				points -> o = points -> o + 1;
+				points -> a = points -> a + 1;
 			}
 			else 
 			{
-				ModePoints -> o = ModePoints -> o + 1;
+				points -> o = points -> o + 1;
 			}
 		}
 	}
@@ -260,79 +266,79 @@ points * addPoints(points * ModePoints, HSV * HSVvalues)
 		{
 			if(HSVvalues->saturation >= 0 && HSVvalues->saturation < 80)
 			{
-				ModePoints -> y = ModePoints -> y + 1;
+				points -> y = points -> y + 1;
 			}
 			else 
 			{
-				ModePoints -> i = ModePoints -> i + 1;
+				points -> i = points -> i + 1;
 			}
 		}
 		else 
 		{
 			if(HSVvalues -> value <= 100 && HSVvalues -> value > 80)
 			{
-				ModePoints -> i = ModePoints -> i + 1;
+				points -> i = points -> i + 1;
 			}
 			else if(HSVvalues -> value <= 80 && HSVvalues -> value > 40)
 			{
-				ModePoints -> p = ModePoints -> p + 1;
-				ModePoints -> a = ModePoints -> a + 1;
+				points -> p = points -> p + 1;
+				points -> a = points -> a + 1;
 			}
 			else if(HSVvalues -> value <= 40 && HSVvalues -> value > 20)
 			{
-				ModePoints -> o = ModePoints -> o + 1;
-				ModePoints -> a = ModePoints -> a + 1;
+				points -> o = points -> o + 1;
+				points -> a = points -> a + 1;
 			}
 			else 
 			{
-				ModePoints -> o = ModePoints -> o + 1;
+				points -> o = points -> o + 1;
 			}
 		}
 	}
 
-	return ModePoints;
+	return points;
 
 }
 
 
 //Finding what scale will be used based on the RGB characteristics 
-void findScale(points * ModePoints, songChars * song)
+void findScale(ModePoints * points, songChars * song)
 {
 	//put in read file here repeatedly to get new value to place and call this function
 	//to add points to each mode then choose which one with the highest
 	
 	Mode scaleMode = 'a';
-	int max = ModePoints -> a;
-	int i;	
+	int max = points -> a;
+	//int i;	
 	
-	if(ModePoints -> d > max)
+	if(points -> d > max)
 	{
-		max = ModePoints -> d;
+		max = points -> d;
 		scaleMode = 'd';
 	}
-	if(ModePoints -> i > max)
+	if(points -> i > max)
 	{
-		max = ModePoints -> i;
+		max = points -> i;
 		scaleMode = 'i';
 	}
-	if(ModePoints -> o > max)
+	if(points -> o > max)
 	{
-		max = ModePoints -> o;
+		max = points -> o;
 		scaleMode = 'o';
 	}
-	if(ModePoints -> y > max)
+	if(points -> y > max)
 	{
-		max = ModePoints -> y;
+		max = points -> y;
 		scaleMode = 'y';
 	}
-	if(ModePoints -> m > max)
+	if(points -> m > max)
 	{
-		max = ModePoints -> m;
+		max = points -> m;
 		scaleMode = 'm';
 	}
-	if(ModePoints -> p > max)
+	if(points -> p > max)
 	{
-		max = ModePoints -> p;
+		max = points -> p;
 		scaleMode = 'p';
 	}
 
@@ -430,8 +436,8 @@ HSV * convertHSV(RGB * toConvert)
 	float Rp = toConvert -> red / 255;
 	float Gp = toConvert -> green / 255;
 	float Bp = toConvert -> blue / 255;
-	float Cmax = max(max(Rp, Gp), max(Gp, Bp)); 
-	float Cmin = min(min(Rp, Gp), min(Gp, Bp));
+	float Cmax = fmaxf(fmaxf(Rp, Gp), fmaxf(Gp, Bp)); 
+	float Cmin = fminf(fminf(Rp, Gp), fminf(Gp, Bp));
 	float delta = Cmax - Cmin;
 
 
@@ -439,7 +445,7 @@ HSV * convertHSV(RGB * toConvert)
 
 	if(Cmax == Rp)
 	{
-		HSVvalues -> hue = 60 * ((Gp-Bp)/delta)*mod(6);
+		HSVvalues -> hue = 60 * fmod(((Gp-Bp)/delta),6);
 	}
 	else if(Cmax == Gp)
 	{

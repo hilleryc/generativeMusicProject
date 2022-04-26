@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 //define
 
@@ -95,6 +96,6 @@ scaleNode * buildNode(Note note);
 
 scaleNode * buildScale(Note firstNote, songChars * song);
 
-void findScale(points * ModePoints, songChars * song);
+void findScale(ModePoints * points, songChars * song);
 
-points * addPoints(points * ModePoints, HSV * HSVvalues);
+ModePoints * addPoints(ModePoints * points, HSV * HSVvalues);

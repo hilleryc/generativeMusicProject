@@ -1,4 +1,4 @@
-CFLAGS = -std=c99 -g -Wall -Wshadow --pedantic -Wvla -Werror
+CFLAGS = -std=c99 -lm -g -Wall -Wshadow --pedantic -Wvla -Werror
 GCC = gcc $(CFLAGS)
 EXEC = notes
 VALGRIND = valgrind --tool=memcheck --leak-check=yes --verbose
@@ -8,7 +8,7 @@ all: generatingMusic.c
 
 
 test: all
-	./$(EXEC) 75 117 158
+	./$(EXEC) test1
 	
 memory: $(EXEC)
 	$(VALGRIND) --log-file=log1 ./$(EXEC) 75 117 158
