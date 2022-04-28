@@ -8,7 +8,7 @@ all: generatingMusic.c
 
 
 test: all
-	./$(EXEC) test1
+	./$(EXEC) test1 out1
 	
 memory: $(EXEC)
 	$(VALGRIND) --log-file=log1 ./$(EXEC) 75 117 158

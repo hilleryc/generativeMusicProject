@@ -69,17 +69,17 @@ typedef struct songChars{
 
 typedef struct RGB{
 
-	int red;
-	int green;
-	int blue;
+	float red;
+	float green;
+	float blue;
 
 } RGB;
 
 typedef struct HSV{
 
-	int hue;
-	int saturation;
-	int value;
+	float hue;
+	float saturation;
+	float value;
 
 } HSV;
 

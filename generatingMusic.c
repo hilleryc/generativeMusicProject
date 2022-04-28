@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
+//#include <ext.h>
 #include "generatingMusic.h"
 
 //inputs are RGB values
@@ -11,40 +12,50 @@ int main(int argc, char ** argv)
 {
 
 
-	if(argc != 2)
+	if(argc != 3)
 	{
 		fprintf(stderr, "Need good file name");
 		return EXIT_FAILURE;
 	}
 
-	FILE * inFile = fopen(argv[2], "r");
+	FILE * inFile = fopen(argv[1], "r");
 
-	printf("Get file\n");
+	if(inFile == NULL)
+	{
+		printf("No file\n");
+	}
 	
 	int rot;
 	int grun;
 	int blau;
-	float freq = 0;	
+	//float freq = 0;	
 
 	RGB * avgValues;
 	songChars * song = malloc(sizeof(songChars));
 	HSV * HSVvalues = malloc(sizeof(HSV));
 	ModePoints * points = malloc(sizeof(ModePoints));
 	
-	//rot = (int) strtol(argv[1], NULL, 10);
-	//grun = (int) strtol(argv[2], NULL, 10);
-	//blau = (int) strtol(argv[3], NULL, 10);
 
 
 	while(fscanf(inFile, "%d %d %d", &rot, &grun, &blau) == 3)
 	{
-		printf("scans first\n");
 		avgValues = buildRGB(rot, grun, blau);
 		HSVvalues = convertHSV(avgValues);
+
+		//printf("HSV values: %f %f %f\n", HSVvalues -> hue, HSVvalues -> saturation, HSVvalues -> value);
 
 		addPoints(points, HSVvalues);	 	
 	
 	}
+
+	/*printf("a points: %d\n", points -> a);
+	printf("d points: %d\n", points -> d);
+	printf("i points: %d\n", points -> i);
+	printf("o points: %d\n", points -> o);
+	printf("y points: %d\n", points -> y);
+	printf("m points: %d\n", points -> m);
+	printf("p points: %d\n", points -> p);
+	*/	
 
 	int random;
 	Note firstNote;
@@ -67,21 +78,66 @@ int main(int argc, char ** argv)
 		case 11:	firstNote = AB; break;
 	}
 	
+	int random1;
+	srand(time(NULL));
+	random1 = rand() % 10;
+	
+	song -> octave = random1;
+	
 	//freq = findFreq(firstNote, song);
-
 	//HSVvalues = convertHSV(avgValues);
 
 	findScale(points, song);
-	
 	scaleNode * beginningScale = buildScale(firstNote, song);	
 	
-
 
 	//For finding the note to use during operation, could use random seed, then seed%12 - 1
 	//FOR THE PURPOSES OF TESTING FUNCTIONS/OPERATIONS
 	
-	char * printNote;
+	/*
+	char * printNote1;
 	printf("Scale: ");
+	scaleNode * copy = beginningScale;
+	while(copy != NULL)
+	{
+		switch(copy -> note)
+		{
+			case C:  	printNote1 = "C"; break;
+			case DB:	printNote1 = "Db"; break;
+			case D: 	printNote1 = "D"; break;
+			case EB:	printNote1 = "Eb"; break;
+			case E:		printNote1 = "E"; break;
+			case F:		printNote1 = "F"; break;
+			case GB:	printNote1 = "Gb"; break;
+			case G:		printNote1 = "G"; break;
+			case AB:	printNote1 = "Ab"; break;
+			case A:		printNote1 = "A"; break;
+			case BB:	printNote1 = "Bb"; break;
+			case B:		printNote1 = "B"; break;
+		} 
+		printf("%s ", printNote1);
+		copy = copy -> next;
+	}
+	printf("\n");
+	printf("Song Mode: %c\n", song -> mode);
+	printf("Steps: %s\n", song -> steps);
+
+	printf("R Value: %f\nG Value: %f\nB Value: %f\n", avgValues -> red, avgValues -> green, avgValues -> blue);	
+	printf("Frequency: %f\n", freq);
+	*/
+	//FINISHED WITH TESTING
+
+	fclose(inFile);
+
+	FILE * outFile = fopen(argv[2], "w");
+
+	if(outFile == NULL)
+	{
+		printf("No out file\n");
+	}
+
+	char * printNote;
+	//printf("Scale: ");
 	while(beginningScale != NULL)
 	{
 		switch(beginningScale -> note)
@@ -99,19 +155,15 @@ int main(int argc, char ** argv)
 			case BB:	printNote = "Bb"; break;
 			case B:		printNote = "B"; break;
 		} 
-		printf("%s,", printNote);
+		fprintf(outFile, "%s ", printNote);
 		beginningScale = beginningScale -> next;
 	}
-	printf("\n");
 
-	printf("Song Mode: %c\n", song -> mode);
-	printf("Steps: %s\n", song -> steps);
-
-	printf("R Value: %d\nG Value: %d\nB Value: %d\n", avgValues -> red, avgValues -> green, avgValues -> blue);	
-	printf("Frequency: %f\n", freq);
+	fprintf(outFile, "%f ", song -> pace);
+	fprintf(outFile, "%d\n", song -> octave);
 	
-	//FINISHED WITH TESTING
-	fclose(inFile);
+	fclose(outFile);
+	
 	deleteRGB(avgValues);
 	free(song);
 	free(HSVvalues);
@@ -433,13 +485,16 @@ scaleNode * buildNode(Note note)
 HSV * convertHSV(RGB * toConvert)
 {
 
-	float Rp = toConvert -> red / 255;
-	float Gp = toConvert -> green / 255;
-	float Bp = toConvert -> blue / 255;
+	float Rp = (toConvert -> red)/255;
+	float Gp = (toConvert -> green)/255;
+	float Bp = (toConvert -> blue)/255;
 	float Cmax = fmaxf(fmaxf(Rp, Gp), fmaxf(Gp, Bp)); 
 	float Cmin = fminf(fminf(Rp, Gp), fminf(Gp, Bp));
 	float delta = Cmax - Cmin;
 
+	//printf("green: %f\n", toConvert -> green);
+	//printf("Gp: %f\n", Gp);
+	//printf("Cmax value: %f\n", Cmax);
 
 	HSV * HSVvalues = malloc(sizeof(HSV)); 
 
@@ -466,12 +521,12 @@ HSV * convertHSV(RGB * toConvert)
 	}
 	else 
 	{
-		HSVvalues -> saturation = delta/Cmax;
+		HSVvalues -> saturation = (delta/Cmax) * 100;
 	}
 
 	
-	HSVvalues -> value = Cmax;
-
+	HSVvalues -> value = Cmax * 100;
+ 
 	return HSVvalues;
 }
 //setting values for the RGB struct to easily store those values
