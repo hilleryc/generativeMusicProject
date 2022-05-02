@@ -32,7 +32,7 @@ int main(int argc, char ** argv)
 
 	RGB * avgValues;
 	songChars * song = malloc(sizeof(songChars));
-	HSV * HSVvalues = malloc(sizeof(HSV));
+	HSV * HSVvalues;
 	ModePoints * points = malloc(sizeof(ModePoints));
 	
 
@@ -43,8 +43,10 @@ int main(int argc, char ** argv)
 		HSVvalues = convertHSV(avgValues);
 
 		//printf("HSV values: %f %f %f\n", HSVvalues -> hue, HSVvalues -> saturation, HSVvalues -> value);
-
-		addPoints(points, HSVvalues);	 	
+		
+		addPoints(points, HSVvalues);	
+		deleteRGB(avgValues);
+		free(HSVvalues); 	
 	
 	}
 
@@ -136,11 +138,12 @@ int main(int argc, char ** argv)
 		printf("No out file\n");
 	}
 
+	scaleNode * scaleCopy = beginningScale;
 	char * printNote;
 	//printf("Scale: ");
-	while(beginningScale != NULL)
+	while(scaleCopy != NULL)
 	{
-		switch(beginningScale -> note)
+		switch(scaleCopy -> note)
 		{
 			case C:  	printNote = "C"; break;
 			case DB:	printNote = "Db"; break;
@@ -156,7 +159,7 @@ int main(int argc, char ** argv)
 			case B:		printNote = "B"; break;
 		} 
 		fprintf(outFile, "%s ", printNote);
-		beginningScale = beginningScale -> next;
+		scaleCopy = scaleCopy -> next;
 	}
 
 	fprintf(outFile, "%f ", song -> pace);
@@ -164,9 +167,17 @@ int main(int argc, char ** argv)
 	
 	fclose(outFile);
 	
-	deleteRGB(avgValues);
+	scaleNode * afterNode = beginningScale -> next;
+	while(afterNode != NULL)
+	{
+		free(beginningScale);
+		beginningScale = afterNode;
+		afterNode = afterNode -> next;
+	}
+	free(beginningScale);
+	//deleteRGB(avgValues);
 	free(song);
-	free(HSVvalues);
+	//free(HSVvalues);
 	free(points);
 
 	return EXIT_SUCCESS;
