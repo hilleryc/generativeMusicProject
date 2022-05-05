@@ -3,44 +3,65 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
+#include "findNote1.h"
 
 int main(int argc, char ** argv)
 {
 
-	FILE * outfile = fopen(argv[8], "w");
+	FILE * infile = fopen(argv[1], "r");
+	FILE * outfile = fopen(argv[2], "w");
 
-	char * firstNote = argv[1];
-	char * secNote = argv[2];
-	char * thirdNote = argv[3];
-	char * fourthNote = argv[4];
-	char * fifthNote = argv[5];
-	char * sixthNote = argv[6];
-	char * seventhNote = argv[7];
+	char firstNote[2] = "";
+	char secNote[2] = "";
+	char thirdNote[2] = "";
+	char fourthNote[2] = "";
+	char fifthNote[2] = "";
+	char sixthNote[2] = "";
+	char seventhNote[2] = "";
 
+	float pace;
+	int octave;
 
-	int octave = (int) strtol(argv[8], NULL, 10);
+	fscanf(infile, "%s %s %s %s %s %s %s %f %d", firstNote, secNote, thirdNote, fourthNote, fifthNote, sixthNote, seventhNote, &pace, &octave);
+	
+	
+	/*fscanf(infile, "%s ", secNote);
+	fscanf(infile, "%s ", thirdNote);
+	fscanf(infile, "%s ", fourthNote);
+	fscanf(infile, "%s ", fifthNote);
+	fscanf(infile, "%s ", sixthNote);
+	fscanf(infile, "%s ", seventhNote);
+
+	float pace;
+	fscanf(infile, "%f ", &pace);
+
+	int octave; 
+	fscanf(infile, "%d", &octave);*/
 	char * note;
 
+	//printf("scans in\n");
+	int i;
 	int random;
 	srand(time(NULL));
-	random = rand() % 7;
-	
-	switch(random)
-	{
-		case 0:		note = firstNote; break;
-		case 1:		note = secNote;   break;
-		case 2:		note = thirdNote; break;
-		case 3:		note = fourthNote;break;
-		case 4:		note = fifthNote; break;
-		case 5: 	note = sixthNote; break;
-		case 6:		note = seventhNote;break;
-	}
-	
-	float toPrint;	
+
 
 	for(i=0; i<99; i++)
 	{
+		random = rand() % 7;
+		
+		switch(random)
+		{
+			case 0:		note = firstNote; break;
+			case 1:		note = secNote;   break;
+			case 2:		note = thirdNote; break;
+			case 3:		note = fourthNote;break;
+			case 4:		note = fifthNote; break;
+			case 5: 	note = sixthNote; break;
+			case 6:		note = seventhNote;break;
+		}
+	
+		float toPrint;	
+
 		toPrint = findFreqs(note, octave);
 	
 		fprintf(outfile, "%f ", toPrint);

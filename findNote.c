@@ -9,6 +9,7 @@ int main(int argc, char ** argv)
 {
 
 
+
 	char * firstNote = argv[1];
 	char * secNote = argv[2];
 	char * thirdNote = argv[3];
@@ -34,6 +35,11 @@ int main(int argc, char ** argv)
 		case 5: 	note = sixthNote; break;
 		case 6:		note = seventhNote;break;
 	}	
+	
+
+
+
+
 
 	float freq;
 
